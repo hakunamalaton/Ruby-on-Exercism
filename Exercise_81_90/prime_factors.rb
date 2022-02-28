@@ -8,19 +8,16 @@ To get started with TDD, see the `README.md` file in your
 require 'prime'
 class PrimeFactors
   def self.of(number)
-    return [] if number < 2  
+    return [] if number < 2
     i = 2
     res = []
     while number > 1
-       if number % i == 0 && Prime.prime?(i)
-           res += [i]
-           number /= i
-       else
-           i += 1
-       end
+      if number % i == 0
+        res += [2]
+        number /= 2
+      else
+        i++
+      end
     end
-    res
   end
 end
-
-p PrimeFactors.of(901_255)
