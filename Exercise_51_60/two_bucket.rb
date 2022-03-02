@@ -6,44 +6,94 @@ To get started with TDD, see the `README.md` file in your
 `ruby/two-bucket` directory.
 =end
 class TwoBucket
-    @@state = [0,0]
-    @@move = 0
-    def initialize(size_bucket_1,size_bucket_2,liter_reach, first_bucket)
-      @size_bucket_1 = size_bucket_1
-      @size_bucket_2 = size_bucket_2
-      @liter_reach = liter_reach
-      @first_bucket = first_bucket
-      if @first_bucket == 'one'
-        @@state[0] += @size_bucket_1
-        @@move += 1
-      else
-        @@state[1] += @size_bucket_2
-        @@move += 1
-      end
-    end
-  
-    def moves
-      return change_state_bucket(@@state[0],@@state[1],@liter_reach,@first_bucket)
-    end
-
-
-    private
-    def change_state_bucket(liter_in_bucket_1,liter_in_bucket_2,liter_to_reach, first_bucket)
-      if liter_in_bucket_1 == liter_to_reach || liter_in_bucket_2 == liter_to_reach
-        return @@move
-      end
-      
-      if liter_in_bucket_1 == @@state[0]
-        
-      elsif liter_in_bucket_2 == @@state[1]
-
-      else
-
-      end
-
-    end
+  def initialize(size_bucket_1,size_bucket_2,liter_reach, first_bucket)
+    @size_bucket_1 = size_bucket_1
+    @size_bucket_2 = size_bucket_2
+    @liter_reach = liter_reach
+    @first_bucket = first_bucket
   end
 
+  def moves
+    minSteps(@size_bucket_1,@size_bucket_2,@liter_reach,@first_bucket)
+  end
 
-  subject = TwoBucket.new(3, 5, 1, 'one')
-  p subject.moves
+  def goal_bucket
+    @goal_bucket
+  end
+
+  def other_bucket
+    @other
+  end
+
+  private
+  def pour(toJugCap, fromJugCap, d)
+ 
+    # Initialize current amount of water
+    # in source and destination jugs
+    fromJug = fromJugCap
+    toJug  = 0
+ 
+    # Initialize steps required
+    step = 1
+    if ((fromJug == d) || (toJug == d))
+      if fromJug == d
+        @goal_bucket = @first_bucket
+        @other = toJug
+      else
+        @goal_bucket = (['one','two'] - [@first_bucket]).first
+        @other = fromJug
+      end
+    end
+    if toJugCap == d
+      @goal_bucket = (['one','two'] - [@first_bucket]).first
+      @other = fromJug
+      return step + 1
+    end
+    while ((fromJug  != d) && (toJug != d))
+        # Find the maximum amount that can be
+        # poured
+        temp =[fromJug, toJugCap-toJug].min
+        # Pour 'temp' liter from 'fromJug' to 'toJug'
+        toJug = toJug + temp
+        fromJug = fromJug - temp
+
+        step =  step + 1
+        if ((fromJug == d) || (toJug == d))
+            if fromJug == d
+              @goal_bucket = @first_bucket
+              @other = toJug
+            else
+              @goal_bucket = (['one','two'] - [@first_bucket]).first
+              @other = fromJug
+            end
+            break
+        end
+        # If first jug becomes empty, fill it
+        if fromJug == 0
+            fromJug = fromJugCap
+            step =  step + 1
+        end 
+        # If second jug becomes full, empty it
+        if toJug == toJugCap
+            toJug = 0
+            step =  step + 1
+        end
+      end
+      return step
+end
+# Returns count of minimum steps needed to
+# measure d liter
+def minSteps(n, m, d, st)
+    if (d % (n.gcd(m)) != 0)
+        return -1
+    end
+    # Return minimum two cases:
+    # a) Water of n liter jug is poured into
+    #    m liter jug
+    if st == 'two'
+      return pour(n,m,d)
+    else
+      return pour(m,n,d)
+    end
+end
+end
