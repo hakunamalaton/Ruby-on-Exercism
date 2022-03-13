@@ -1,3 +1,10 @@
+=begin
+Write your code for the 'Meetup' exercise in this file. Make the tests in
+`meetup_test.rb` pass.
+
+To get started with TDD, see the `README.md` file in your
+`ruby/meetup` directory.
+=end
 require 'date'
 
 class Meetup
@@ -46,5 +53,3 @@ class Meetup
       
     end
   end
-
-p Meetup.new(12, 2013).day(:friday, :last)
