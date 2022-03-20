@@ -1,32 +1,62 @@
-=begin
-Write your code for the 'Allergies' exercise in this file. Make the tests in
-`allergies_test.rb` pass.
+class BreakSocola
+  attr_accessor :four_direction
 
-To get started with TDD, see the `README.md` file in your
-`ruby/allergies` directory.
-=end
-class Allergies
-    ALLERGIES = ['eggs', 'peanuts', 'shellfish', 'strawberries',
-      'tomatoes', 'chocolate', 'pollen', 'cats']
-    def initialize(score)
-      @allergies_score = score - score/256 * 256
-      @list_allergies = []
-    end
-  
-    def allergic_to?(allergy)
-      list if @allergies_score > 0
-      @list_allergies.include?(allergy)
-    end
-    
-    def list
-      return [] if @allergies_score < 1
-      max_allergy = Math.log(@allergies_score,2).to_i 
-      while @allergies_score > 0
-        @list_allergies += [ALLERGIES[max_allergy]]
-        @allergies_score -= 2**max_allergy
-        max_allergy = Math.log(@allergies_score,2).to_i if @allergies_score > 0
-      end
-      @list_allergies
-    end
+  def initialize(size,x,y)
+    @four_direction = [x,y,size[0]-y-1,size[1]-x-1]
   end
+
+  def play(direct,start)
+    if direct.include? -1 
+      direct = direct.map do |dir|
+        dir = dir == -1 ? 0 : dir
+      end
+    end
+
+    # base case
+    if direct.count(0) == 4 || direct.count(0) == 3
+      return start
+    elsif direct.count(0) == 2
+      if direct.uniq.length == 3
+        return start
+      else
+        return !start
+      end
+    end
+    # normal case
+    # case 2: on the edge but the vertex
+    result = []
+    
+    i = 1
+    while direct[0] >= i
+      result << play([direct[0]-i,direct[1],direct[2],direct[3]],!start)
+      i += 1
+    end
+
+    i = 1
+    while direct[1] >= i
+      result << play([direct[0],direct[1]-i,direct[2],direct[3]],!start)
+      i += 1
+    end
+
+    i = 1
+    while direct[2] >= i
+      result << play([direct[0],direct[1],direct[2]-i,direct[3]],!start)
+      i += 1
+    end
+
+    i = 1
+    while direct[3] >= i
+      result << play([direct[0],direct[1],direct[2],direct[3]-i],!start)
+      i += 1
+    end
   
+    
+    if result.include? start
+      return start
+    else
+      return !start
+    end
+    # case 3: not on the edge
+  end
+end
+
