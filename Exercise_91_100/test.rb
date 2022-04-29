@@ -1,62 +1,71 @@
-class BreakSocola
-  attr_accessor :four_direction
+class KnapSack
 
-  def initialize(size,x,y)
-    @four_direction = [x,y,size[0]-y-1,size[1]-x-1]
+  def initialize(capacity, items)
+    @capacity = capacity
+    # quantity, weight, value
+    @items = items
   end
 
-  def play(direct,start)
-    if direct.include? -1 
-      direct = direct.map do |dir|
-        dir = dir == -1 ? 0 : dir
-      end
+  def execute
+    max_value(@capacity, @items, 0)
+  end
+
+  private 
+
+  def max_value(capacity, items, ase)
+    # puts "#{items} in this case #{ase}"
+    if items.length == 0
+      return 0
     end
 
-    # base case
-    if direct.count(0) == 4 || direct.count(0) == 3
-      return start
-    elsif direct.count(0) == 2
-      if direct.uniq.length == 3
-        return start
-      else
-        return !start
-      end
+    if items.length == 1 and items[items.keys[0]][0] == 1
+      return items[items.keys[0]][1] <= capacity ? items[items.keys[0]][2] : 0
     end
-    # normal case
-    # case 2: on the edge but the vertex
-    result = []
+
+    # decrease items by 1 element
+    new_items = {}
+    items.clone.each do |k,v|
+      new_items[k] = v.clone
+    end
     
-    i = 1
-    while direct[0] >= i
-      result << play([direct[0]-i,direct[1],direct[2],direct[3]],!start)
-      i += 1
-    end
+    new_items[new_items.keys[0]][0] -= 1 
+    new_items.delete(new_items.keys[0]) if new_items[new_items.keys[0]][0] == 0
 
-    i = 1
-    while direct[1] >= i
-      result << play([direct[0],direct[1]-i,direct[2],direct[3]],!start)
-      i += 1
-    end
+    items[items.keys[0]][0] -= 1 
+    weight_of_processing_item = items[items.keys[0]][1] 
+    value_of_processing_item = items[items.keys[0]][2] 
+    items.delete(items.keys[0]) if items[items.keys[0]][0] == 0
 
-    i = 1
-    while direct[2] >= i
-      result << play([direct[0],direct[1],direct[2]-i,direct[3]],!start)
-      i += 1
-    end
 
-    i = 1
-    while direct[3] >= i
-      result << play([direct[0],direct[1],direct[2],direct[3]-i],!start)
-      i += 1
-    end
-  
+    # puts items.object_id
+    # puts items
+    # puts new_items.object_id
+    # puts new_items
+    # return 
+    case_1 = 0
+    case_2 = 0
     
-    if result.include? start
-      return start
-    else
-      return !start
+    if capacity >= weight_of_processing_item
+        case_1 = max_value(capacity - weight_of_processing_item, items, 1) + value_of_processing_item
     end
-    # case 3: not on the edge
+
+    case_2 = max_value(capacity, new_items, 2)
+    # puts "case 1: #{case_1}, case 2: #{case_2}, new_items: #{items}"
+    return [case_1, case_2].max
+
   end
 end
 
+
+
+# def foo(hash)
+#   h1 = hash.clone
+#   h1.delete(:A)
+#   puts hash
+# end
+
+# hash = {
+#     A: 1,
+#     B: 2
+# }
+# foo(hash)
